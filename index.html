@@ -7,43 +7,110 @@
   <link rel="manifest" href="manifest.json">
   <script src="https://unpkg.com/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js"></script>
   <style>
-    body { background:#1a1a2e; color:white; font-family:sans-serif; text-align:center; margin:0; padding:10px; }
+    body { background:#1a1a2e; color:white; font-family:sans-serif; text-align:center; margin:0; padding:10px 10px 80px; }
     select { font-size:18px; padding:8px; margin:8px; }
     button { background:#2a2a4e; color:white; border:none; padding:10px 14px; margin:3px; border-radius:6px; font-size:15px; }
     button.on { background:#e94560; }
-    #chart { width:100%; height:350px; }
-    #price { font-size:22px; color:#e94560; }
-    #chg { font-size:18px; margin:4px; }
+    .chart { width:100%; height:340px; }
+    #price, #gprice { font-size:22px; color:#e94560; }
+    #chg, #gsig { font-size:18px; margin:4px; }
     .up { color:#26a69a; }
     .down { color:#e94560; }
+    .tab { display:none; }
+    .tab.show { display:block; }
+    nav { position:fixed; bottom:0; left:0; right:0; background:#12122a; display:flex; border-top:1px solid #2a2a4e; }
+    nav button { flex:1; margin:0; border-radius:0; background:#12122a; padding:16px 4px; }
+    nav button.on { background:#e94560; }
+    .news { background:#22223d; border-radius:8px; padding:12px; margin:10px 0; text-align:left; }
+    .news small { color:#9a9ab5; }
+    .note { color:#9a9ab5; font-size:13px; }
+    #splash { position:fixed; inset:0; background:#1a1a2e; z-index:99; display:flex; flex-direction:column;
+              align-items:center; justify-content:center; transition:opacity .6s; }
+    #splash img { width:140px; height:140px; border-radius:24px; object-fit:cover; }
+    #splash h1 { color:#e94560; margin:18px 0 4px; }
+    #splash p { color:#9a9ab5; margin:0; }
   </style>
 </head>
 <body>
-  <h2>FOREX ቻርት</h2>
-  <select id="pair" onchange="load()">
-    <option value="EUR,USD">EUR/USD</option>
-    <option value="GBP,USD">GBP/USD</option>
-    <option value="USD,JPY">USD/JPY</option>
-    <option value="USD,ETB">USD/ETB</option>
-  </select>
-  <div id="price">...</div>
-  <div id="chg"></div>
-  <div>
-    <button id="d30" onclick="setDays(30)">1 ወር</button>
-    <button id="d90" class="on" onclick="setDays(90)">3 ወር</button>
-    <button id="d365" onclick="setDays(365)">1 ዓመት</button>
+
+  <div id="splash">
+    <img src="logo.png" onerror="this.onerror=null;this.src='icon.svg'">
+    <h1>FOREX ቻርት</h1>
+    <p>እንኳን ደህና መጡ</p>
   </div>
-  <div>
-    <button id="tline" class="on" onclick="setType('line')">መስመር</button>
-    <button id="tcandle" onclick="setType('candle')">Candle</button>
+
+  <div id="tab-chart" class="tab show">
+    <h2>FOREX ቻርት</h2>
+    <select id="pair" onchange="load()">
+      <option value="EUR,USD">EUR/USD</option>
+      <option value="GBP,USD">GBP/USD</option>
+      <option value="USD,JPY">USD/JPY</option>
+      <option value="USD,ETB">USD/ETB</option>
+    </select>
+    <div id="price">...</div>
+    <div id="chg"></div>
+    <div>
+      <button id="d30" onclick="setDays(30)">1 ወር</button>
+      <button id="d90" class="on" onclick="setDays(90)">3 ወር</button>
+      <button id="d365" onclick="setDays(365)">1 ዓመት</button>
+    </div>
+    <div>
+      <button id="tline" class="on" onclick="setType('line')">መስመር</button>
+      <button id="tcandle" onclick="setType('candle')">Candle</button>
+    </div>
+    <div id="chart" class="chart"></div>
   </div>
-  <div id="chart"></div>
+
+  <div id="tab-news" class="tab">
+    <h2>የገበያ ዜና</h2>
+    <p class="note">ናሙና ዜና ነው (Demo)። እውነተኛ ዜና በኋላ እናገናኛለን።</p>
+    <div class="news"><b>ዶላር ከዩሮ ጋር ሲነጻጸር ተለዋዋጭነት አሳየ</b><br><small>ናሙና · ገበያ</small></div>
+    <div class="news"><b>ባለሀብቶች የወለድ መጠን ውሳኔን እየጠበቁ ነው</b><br><small>ናሙና · ኢኮኖሚ</small></div>
+    <div class="news"><b>ወርቅ እንደ አስተማማኝ ማከማቻ ትኩረት አገኘ</b><br><small>ናሙና · ሸቀጦች</small></div>
+    <div class="news"><b>የብር የምንዛሪ ዋጋ እንቅስቃሴ</b><br><small>ናሙና · ኢትዮጵያ</small></div>
+  </div>
+
+  <div id="tab-demo" class="tab">
+    <h2>ወርቅ (XAU) Demo</h2>
+    <p class="note">ናሙና ዳታ ነው፤ እውነተኛ ዋጋ አይደለም። ለመማር ብቻ።</p>
+    <div id="gprice"></div>
+    <div id="gsig"></div>
+    <div class="note"><span style="color:#e94560">●</span> ዋጋ &nbsp; <span style="color:#f5c542">●</span> SMA 20 &nbsp; <span style="color:#4da3ff">●</span> SMA 50</div>
+    <div id="gchart" class="chart"></div>
+  </div>
+
+  <nav>
+    <button id="n-chart" class="on" onclick="showTab('chart')">ቻርት</button>
+    <button id="n-news" onclick="showTab('news')">ዜና</button>
+    <button id="n-demo" onclick="showTab('demo')">Demo</button>
+  </nav>
 
   <script>
-    const chart = LightweightCharts.createChart(document.getElementById('chart'), {
+    // ---- Splash ----
+    setTimeout(() => {
+      const s = document.getElementById('splash');
+      s.style.opacity = 0;
+      setTimeout(() => s.style.display = 'none', 600);
+    }, 2200);
+
+    // ---- Tabs ----
+    let goldDone = false;
+    function showTab(t) {
+      ['chart', 'news', 'demo'].forEach(x => {
+        document.getElementById('tab-' + x).classList.toggle('show', x === t);
+        document.getElementById('n-' + x).classList.toggle('on', x === t);
+      });
+      if (t === 'demo' && !goldDone) { goldDone = true; drawGold(); }
+    }
+
+    const opts = {
+      autoSize: true,
       layout: { background: { color: '#1a1a2e' }, textColor: 'white' },
       grid: { vertLines: { color: '#2a2a4e' }, horzLines: { color: '#2a2a4e' } }
-    });
+    };
+
+    // ---- FOREX chart ----
+    const chart = LightweightCharts.createChart(document.getElementById('chart'), opts);
     let series = null, closes = [], days = 90, type = 'line';
 
     function draw() {
@@ -102,6 +169,50 @@
       }
     }
     load();
+
+    // ---- Gold demo + indicator ----
+    function rng(seed) {
+      return function () {
+        seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+        let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+        t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+        return ((t ^ t >>> 14) >>> 0) / 4294967296;
+      };
+    }
+
+    function sma(data, n) {
+      const out = [];
+      for (let i = n - 1; i < data.length; i++) {
+        let s = 0;
+        for (let j = i - n + 1; j <= i; j++) s += data[j].value;
+        out.push({ time: data[i].time, value: +(s / n).toFixed(2) });
+      }
+      return out;
+    }
+
+    function drawGold() {
+      const r = rng(2026);
+      const N = 150;
+      let v = 2000;
+      const data = [];
+      for (let i = N; i >= 1; i--) {
+        v += (r() - 0.48) * 18;
+        const d = new Date(Date.now() - i * 86400000).toISOString().slice(0, 10);
+        data.push({ time: d, value: +v.toFixed(2) });
+      }
+      const gc = LightweightCharts.createChart(document.getElementById('gchart'), opts);
+      gc.addLineSeries({ color: '#e94560', lineWidth: 2 }).setData(data);
+      const s20 = sma(data, 20), s50 = sma(data, 50);
+      gc.addLineSeries({ color: '#f5c542', lineWidth: 2 }).setData(s20);
+      gc.addLineSeries({ color: '#4da3ff', lineWidth: 2 }).setData(s50);
+      gc.timeScale().fitContent();
+
+      document.getElementById('gprice').textContent = 'XAU (Demo): ' + data[data.length - 1].value;
+      const up = s20[s20.length - 1].value > s50[s50.length - 1].value;
+      const g = document.getElementById('gsig');
+      g.textContent = up ? '▲ SMA20 ከ SMA50 በላይ፦ ወደ ላይ አዝማሚያ' : '▼ SMA20 ከ SMA50 በታች፦ ወደ ታች አዝማሚያ';
+      g.className = up ? 'up' : 'down';
+    }
   </script>
 </body>
 </html>
